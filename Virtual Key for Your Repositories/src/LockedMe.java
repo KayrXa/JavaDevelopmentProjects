@@ -35,9 +35,12 @@ public class LockedMe {
         } else if (i == 2) {
 
             //Display submenu
-            System.out.println("a) Add a file to existing directory list");
-            System.out.println("b) Delete file from existing directory list");
-            System.out.println("c) Search for the file from the main directory");
+            System.out.println("Modifying menu");
+            System.out.println("1) Add a file to existing directory list");
+            System.out.println("2) Delete file from existing directory list");
+            System.out.println("3) Search for the file from the main directory");
+            System.out.println();
+            System.out.println("Please select one of the following choices \"1\" \"2\" \"3\" ");
 
             // Getting input
             int b = sc.nextInt();
