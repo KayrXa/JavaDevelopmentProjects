@@ -1,9 +1,29 @@
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class LockedMe {
+
+
+    // Using input fomr case 3 search file
+    // Search selected file into subdirs, if not added directory search in current, if not found
+    public static void findFile(String sname, File sfile){
+        File[] list = sfile.listFiles();
+        if (list!=null){
+            for (File fil : list)
+            {
+                if (fil.isDirectory()){
+                    findFile(sname,fil);
+                } else if (sname.equalsIgnoreCase(fil.getName())) {
+                    System.out.println("File "+ sname +" was found in path " + fil.getParentFile());
+                }
+            }
+        } else {
+            System.out.println("Sorry you put invalid input, try it again");
+        }
+
+    }
+
 
     public static void baseWelcome() {
 
@@ -23,7 +43,7 @@ public class LockedMe {
         System.out.println("1. Show current file names in ascending order");
         System.out.println("2. Modify file");
         System.out.println();
-        System.out.println("Please select one of the following choices \"1\" \"2\" \"3\" ");
+        System.out.println("Please select one of the following choices \"0\" \"1\" \"2\" ");
         System.out.println("----------------");
 
 
@@ -47,12 +67,21 @@ public class LockedMe {
 
     public static void processingMenu() throws IOException {
 
-
-        Scanner sc = new Scanner(System.in);
+        int choice;
+        //
         while (true) {
+            Scanner sc = new Scanner(System.in).useDelimiter("\n");
             mainMenu();
+            try {
+                choice = sc.nextInt();
+            } catch (Exception e) {
+                System.out.println("Input is not valid, please try it again");
+                choice = 3;
+            }
+
+
             // Getting input of 1st menu
-            int choice = sc.nextInt();
+
             switch (choice) {
                 // OK
                 case 0 -> {
@@ -66,37 +95,30 @@ public class LockedMe {
 
 
                     System.out.println("Please enter directory you want to list, otherwise it will print current root directory");
+
+
                     String dirname = sc.next();
+
+
                     if ("".equals(dirname)) {
                         dirname = "user.dir";
-                    } else {
-                        dirname = dirname;
-                    }
+                        System.out.println("Printing files in selected folder " +dirname+ " in ascending order");
+                        // !! resolve issue if any other dir, or when not inserted anything now just working when typing user.dir
 
-                    System.out.println("Printing files in selected folder " +dirname+ " in ascending order");
-                    // !! resolve issue if any other dir, or when not inserted anything now just working when typing user.dir
+                        String path = System.getProperty(dirname);
+                        File files = new File(path);
+                        System.out.println(dirname);
 
-                    String path = System.getProperty(dirname);
-                    File files = new File(path);
 
-                    for (File f:files.listFiles()) {
-                        if (f.isFile())
-                        System.out.println(f);
-                    }
-                  /*
-                    for (File f:files.listFiles()) {
-                        if (f.isFile())
-                        {
-                        for (String b : files.list()) {
-                            System.out.println(b);
+                        for (File f:files.listFiles()) {
+                            if (f.isFile())
+                                System.out.println(f);
                         }
 
-                        } else if (f.isDirectory())
-                            for (String c : files.list()) {
-                                System.out.println(c);
-                            }
+                        } else {
+                        System.out.println("You entered " +dirname+ " which is not a dir");
+
                     }
-                   */
 
                     System.out.println("----------------");
                 }
@@ -108,6 +130,12 @@ public class LockedMe {
                     System.out.println("----------------");
                     processingSubMenu();
                 }
+
+                case 3 -> {
+                    System.out.println("Refreshed");
+                    processingMenu();
+                }
+
             }
 
         }
@@ -118,22 +146,13 @@ public class LockedMe {
 
 
 
-        // Getting input
-        Scanner sc = new Scanner(System.in);
-
         loop: while (true) {
             subMenu();
+            Scanner sc = new Scanner(System.in).useDelimiter("\n");
             int choicesub = sc.nextInt();
             switch (choicesub) {
 
                 case 1:
-                    // 1. type name of a file and ad it to selected directory, if file exist throw exception - or choose to overwrite
-                    /*
-                    TO DO
-                         Try to easily enter name dir
-                         Create file when not selected anything
-                         If dir do not exist - return again in sub menu
-                    */
 
                     //OK Catching file to create
                     System.out.println("Please write down file you want to create");
@@ -141,60 +160,108 @@ public class LockedMe {
 
                     // OK Catching path to create
                     // !! Format: C:\\Users\\austr\\IdeaProjects\\Projects\\VirtualKeyForOurRepositories\\Programoutput
-                    System.out.println("Ok, preparing to create file " + nfile + " Now type a directory where you want to put it, if in current hit enter");
-                    String path = sc.next();
+                    System.out.println("Ok, preparing to create file " + nfile + " Now type a directory subdirectory where you want to put it, if in current hit enter");
+
+                    Scanner pth = new Scanner(System.in).useDelimiter("\n");
+                    String path = pth.next();
 
 
-                    //path: C:\\Users\\austr\\IdeaProjects\\Projects\\VirtualKeyForOurRepositories\\Programoutput
+                    if ("".equals(path)) {
+                        path = "C:\\Users\\austr\\IdeaProjects\\Projects\\VirtualKeyForOurRepositories\\Programoutput";
+                    }
+
+
+                    //full path: C:\\Users\\austr\\IdeaProjects\\Projects\\VirtualKeyForOurRepositories\\Programoutput
                     //Initializing file for dir
                     File file = new File(path, nfile);
 
-                    //OK Checking if file exists in specific dir, if does then skip creating, if not then create
-                    if (file.exists() && file.isFile()) {
-                        System.out.println("Sorry file was not created");
-                        System.out.println(nfile + " already exist in " + path);
-                    } else {
-                        System.out.println("Creating file " + nfile + " in directory " + path);
-                        file.createNewFile();
-                        if (file.exists() && file.isFile()){
-                            System.out.println("File " +nfile + " was successfully created");
 
-                        }else
-                            System.out.println("Sorry something went wrong, try it again or contact administrator");
+                    //Trying to create file, check if exists, if not then create. If non dir is inserted then throw exception and menu again
+                    try {
+                        if (file.exists() && file.isFile()) {
+                            System.out.println("Sorry file was not created");
+                            System.out.println(nfile + " already exist in " + path);
+                        } else {
+                            System.out.println("Trying to create file " + nfile + " in directory " + path);
+                            file.createNewFile();
+                            if (file.exists() && file.isFile()){
+                                System.out.println("File " +nfile + " was successfully created");
+
+                            }else
+                                System.out.println("Sorry something went wrong, try it again or contact administrator");
+                        }
+                    }catch (IOException c) {
+                        System.out.println("Sorry " + path + " is not a directory");
                     }
+
 
                     System.out.println("----------------");
                     break;
 
                 case 2:
-                    // !! 2. delete selected file from chosen directory, if not added directory delete form current, if not file or directory exist - throw exception, validation - case sensitive - message after action - deleted/not found
+                    // OK delete selected file from chosen directory, if not added directory delete form current, if not file or directory exist - throw exception, validation - case sensitive - message after action - deleted/not found
                     System.out.println("Type a absolute address of file you want to delete");
-                    String delpath = sc.next();
+
+                    //Scan input
+                    Scanner df = new Scanner(System.in).useDelimiter("\n");
+                    String delpath = df.next();
+
+                    //create object for delete file
+                    File delefile = new File(delpath);
 
 
-                    // C:\\Users\\austr\\IdeaProjects\\Projects\\VirtualKeyForOurRepositories\\Programoutput\\test.txt
-                   File delefile = new File(delpath);
-                   if (delefile.isFile()){
-                       System.out.println("Deleting file " +delefile);
-                       delefile.delete();
+                    // Variant if not inseret anything, try to delete for current directory
+                    if ("".equals(delpath)){
+                        delpath = "C:\\Users\\austr\\IdeaProjects\\Projects\\VirtualKeyForOurRepositories\\Programoutput\\";
+                        System.out.println("Ok we will delete file from current dir, but you must type name at least");
+                        Scanner fil = new Scanner(System.in).useDelimiter("\n");
+                        String filedel = fil.next();
+
+                        File filedels = new File(delpath+filedel);
+                        if (filedels.isFile()){
+                            System.out.println("Deleting file " +filedels);
+                            filedels.delete();
 
 
-                       String checkdeletion = (delefile.exists()) ? "Something went wrong file was not deleted, please try again or contact administrator." : "File was successfully deleted!";
-                        System.out.println(checkdeletion);
-                   } else {
-                       System.out.println("Sorry you put invalid input, try it again");
-                   }
+                            String checkdeletion = (filedels.exists()) ? "Something went wrong file was not deleted, please try again or contact administrator." : "File was successfully deleted!";
+                            System.out.println(checkdeletion);
+                        } else {
+                            System.out.println("Sorry you put invalid input, try it again");
+                        }
+
+                        //will delete if have absolute path
+                        //example C:\\Users\\austr\\IdeaProjects\\Projects\\VirtualKeyForOurRepositories\\Programoutput\\test.txt
+                    } else {
+
+                        if (delefile.isFile()){
+                            System.out.println("Deleting file " +delefile);
+                            delefile.delete();
 
 
+                            String checkdeletion = (delefile.exists()) ? "Something went wrong file was not deleted, please try again or contact administrator." : "File was successfully deleted!";
+                            System.out.println(checkdeletion);
+                        } else {
+                            System.out.println("Sorry you put invalid input, try it again");
+                        }
 
+                    }
 
                     System.out.println("----------------");
                     break;
 
                 case 3:
-                    // !! 3. Search selected file from chosen directory, if not added directory search in current, if not found
-                    System.out.println("Searching for file ....");
-                    System.out.println("File .... do/not exist");
+                    // 3. Scanner input for search file, cals findFile method
+
+                    LockedMe ff = new LockedMe();
+                    Scanner scan = new Scanner(System.in);
+                    System.out.println("Type file you want to search:");
+                    String searchedFile = scan.next();
+                    System.out.println("Enter the directory where to search");
+                    String searchedDirectory = scan.next();
+                    ff.findFile(searchedFile, new File(searchedDirectory));
+
+
+
                     System.out.println("----------------");
                     break;
 
@@ -228,6 +295,7 @@ public class LockedMe {
         baseWelcome();
 
         processingMenu();
+
 
 
 
