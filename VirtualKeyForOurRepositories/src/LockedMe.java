@@ -266,13 +266,13 @@ public class LockedMe {
                 case 3:
                     // 3. Scanner input for search file, cals findFile method
 
-                    LockedMe ff = new LockedMe();
+
                     Scanner scan = new Scanner(System.in);
                     System.out.println("Type file you want to search:");
                     String searchedFile = scan.next();
                     System.out.println("Enter the directory where to search");
                     String searchedDirectory = scan.next();
-                    ff.findFile(searchedFile, new File(searchedDirectory));
+                    findFile(searchedFile, new File(searchedDirectory));
 
 
 
