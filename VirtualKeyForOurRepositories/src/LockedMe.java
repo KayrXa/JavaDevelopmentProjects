@@ -145,13 +145,27 @@ public class LockedMe {
     public static void processingSubMenu() throws IOException {
 
 
-
+        int choicesub;
+        //
         loop: while (true) {
+            Scanner sc = new Scanner(System.in).useDelimiter("\n");
+            subMenu();
+            try {
+                choicesub = sc.nextInt();
+            } catch (Exception e) {
+                System.out.println("Input is not valid, please try it again");
+                choicesub = 6;
+            }
+
+            switch (choicesub) {
+
+            /*
+            loop: while (true) {
             subMenu();
             Scanner sc = new Scanner(System.in).useDelimiter("\n");
             int choicesub = sc.nextInt();
             switch (choicesub) {
-
+            */
                 case 1:
 
                     //OK Catching file to create
@@ -282,6 +296,11 @@ public class LockedMe {
                     System.out.println("----------------");
                     System.exit(0);
                     break;
+
+                case 6:
+                    System.out.println("Refreshed");
+                    processingSubMenu();
+
 
             }
         }
